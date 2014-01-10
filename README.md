@@ -15,7 +15,7 @@ RemoteMCServer
 ==============
 一个Minecraft服务器远程控制组件<br />
 目前只在windows环境下测试过，预计将来会支持linux<br />
-exe版本会来的2333<br />
+[exe](https://github.com/arition/RemoteMCServer/releases)版本（未充分测试）<br />
 
 使用
 --------------
