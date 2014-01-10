@@ -1,13 +1,13 @@
 RemoteMCServer
 ==============
 Lanuch a Minecraft Server with a remote console access<br />
-Important:Since the user_control module has not been realized，you'd better use it in LAN to guarantee your security and privacy.<br />
+Important:Since the user_control module has not been realized, you'd better use it in LAN to guarantee your security and privacy.<br />
 Only tested in windows. The Linux version is(or maybe) coming soon...<br />
 
 Instruction
 --------------
 python 2.7 is required for this plugin<br />
-1.Copy all files to the folder where you place the mcserver<br />
+1.Copy all files to the folder where you place the mcserver(it's NOT a bukkit plugin, so don't put it in the /plugin folder!)<br />
 2.Edit mcargs,javaexe in server.py<br />
 3.Run server.py<br />
 4.open 127.0.0.1:8080 in your browser and enjoy it!(other computers nedd to access it with your external network address(like 192.168.X.X:8080))<br />
