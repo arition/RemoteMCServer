@@ -1,7 +1,6 @@
 RemoteMCServer
 ==============
 Lanuch a Minecraft Server with a remote console access<br />
-Important:Since the user_control module has not been realized, you'd better use it in LAN to guarantee your security and privacy.<br />
 Only tested in windows. The Linux version is(or maybe) coming soon...<br />
 
 Instruction
@@ -15,8 +14,8 @@ python 2.7 and this [patch](http://bugs.python.org/file19746/mimetypes-patch2-2.
 RemoteMCServer
 ==============
 一个Minecraft服务器远程控制组件<br />
-注意：由于目前用户权限控制模块还没有写完，为了安全请仅在局域网中运行<br />
 目前只在windows环境下测试过，预计将来会支持linux<br />
+exe版本会来的2333<br />
 
 使用
 --------------
