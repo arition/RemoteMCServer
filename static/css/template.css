@@ -1,5 +1,6 @@
 body {
   padding-top: 50px;
+  font-family:"ff-tisa-web-pro-1","ff-tisa-web-pro-2","Lucida Grande","Helvetica Neue",Helvetica,Arial,"Hiragino Sans GB","Hiragino Sans GB W3","Microsoft YaHei","Microsoft YaHei UI","WenQuanYi Micro Hei",sans-serif;
 }
 .starter-template {
   padding: 10px 15px;
@@ -11,4 +12,7 @@ body {
   max-width: 330px;
   padding: 15px;
   margin: 0 auto;
+}
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, .lead {
+  font-family:"ff-tisa-web-pro-1","ff-tisa-web-pro-2","Lucida Grande","Helvetica Neue",Helvetica,Arial,"Hiragino Sans GB","Hiragino Sans GB W3","Microsoft YaHei","Microsoft YaHei UI","WenQuanYi Micro Hei",sans-serif;
 }
