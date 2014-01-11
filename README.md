@@ -10,12 +10,13 @@ python 2.7 and this [patch](http://bugs.python.org/file19746/mimetypes-patch2-2.
 2.Edit properties in mcrsconfig.xml<br />
 3.Run server.py<br />
 4.open 127.0.0.1:8080 in your browser and enjoy it!(other computers nedd to access it with your external network address(like 192.168.X.X:8080))<br />
+<br />
+[Complied exe](https://github.com/arition/RemoteMCServer/releases) (x64 only, free with python2.7 and the patch)<br />
 
 RemoteMCServer
 ==============
 一个Minecraft服务器远程控制组件<br />
 目前只在windows环境下测试过，预计将来会支持linux<br />
-[exe](https://github.com/arition/RemoteMCServer/releases)版本（未充分测试）<br />
 
 使用
 --------------
@@ -24,3 +25,5 @@ RemoteMCServer
 2.编辑mcrsconfig.xml中的配置<br />
 3.运行 server.py<br />
 4.在浏览器中输入127.0.0.1:8080即可访问（其他电脑需要你的IP地址来访问，像192.168.X.X:8080这样）<br />
+<br />
+[exe](https://github.com/arition/RemoteMCServer/releases)版本（目前只有64位版，无需安装python2.7和补丁，未充分测试）<br />
