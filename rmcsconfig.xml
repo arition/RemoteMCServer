@@ -5,4 +5,5 @@
 	<!--javaexe><![CDATA[test.exe]]></javaexe-->
 	<username><![CDATA[admin]]></username>
 	<password><![CDATA[admin]]></password>
+	<expires><![CDATA[1200]]></expires>
 </config>

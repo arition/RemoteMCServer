@@ -4,6 +4,7 @@ import thread
 import subprocess
 import random
 import string
+import datetime
 
 #utf8处理
 import sys 
@@ -26,10 +27,10 @@ urls = (
 )
 render = web.template.render('templates')
 app = web.application(urls, globals())
-web.config.session_parameters['timeout'] = 60*20
-web.config.session_parameters['ignore_expiry'] = False
+web.config.session_parameters['ignore_expiry'] = True
 web.config.session_parameters['secret_key'] = 'feWh4yv1We22QWQ'
 session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'uid': '0'})
+session_st = datetime.datetime.now()
 
 #消息循环队列初始化
 cache_msg=["","","","","","","","","",""]
@@ -43,6 +44,7 @@ except ImportError:
 configxml = ET.ElementTree(file='rmcsconfig.xml')
 mcargs = configxml.find("mcargs").text
 javaexe = configxml.find("javaexe").text
+expires = configxml.find("expires").text
 
 #启动进程
 p = subprocess.Popen(mcargs, executable=javaexe, universal_newlines=True, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = False)
@@ -53,11 +55,12 @@ class redirect:
 
 class index:
     def GET(self):
+        global session_st
         if not pverify():
             web.seeother("/login")
             return "请先登录"
-        else:
-            return render.index(outstring())
+        session_st = datetime.datetime.now()
+        return render.index(outstring())
 
 class login:
     def GET(self):
@@ -71,10 +74,12 @@ class login:
 
 class userverify:
     def POST(self):
+        global session_st,expires
         if configxml.find("username").text == web.input().username and configxml.find("password").text == web.input().password:
             rstr=random_str()
             session.uid=rstr
-            web.setcookie('uid', rstr, 20*60)
+            session_st = datetime.datetime.now()
+            web.setcookie('uid', rstr, expires)
             web.seeother("/")
         else:
             web.seeother("/login?err=1")
@@ -82,13 +87,15 @@ class userverify:
 
 class msgjson:
     def GET(self):
+        global session_st
         if not pverify():
             return ""
+        session_st = datetime.datetime.now()
         return outstring()
 
 class sendmsg:
     def GET(self):
-        global p,cache_msg,cache_msg_num
+        global p,cache_msg,cache_msg_num,session_st
         if not pverify():
             return ""
         try:
@@ -114,6 +121,7 @@ class sendmsg:
         if cache_msg_num>9:
             cache_msg_num=0
         print u"发送命令:"+cmd+"<br />"
+        session_st = datetime.datetime.now()
         return cmd
 
 def printerr():
@@ -161,8 +169,9 @@ def random_str(randomlength=15):
     return ''.join(a[:randomlength])
 
 def pverify():
+    global session_st,expires
     try:
-        if web.cookies().uid != session.uid:
+        if web.cookies().uid != session.uid or (datetime.datetime.now() - session_st).seconds>expires:
             return False
     except AttributeError:
         return False
