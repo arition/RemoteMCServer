@@ -25,6 +25,6 @@ RemoteMCServer
 2.运行命令`pip install flask`来安装flask<br />
 3.右侧下载zip，复制解压后的所有文件到你的MC服务器所在文件夹<br />
 4.编辑mcrsconfig.xml中的配置<br />
-5.运行 server.py<br />
+5.运行 server_flask.py<br />
 6.在浏览器中输入127.0.0.1:5000即可访问（其他电脑需要你的IP地址来访问，像192.168.X.X:5000这样）<br />
 <br />
