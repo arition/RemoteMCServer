@@ -5,7 +5,7 @@ Lanuch a Minecraft Server with a remote console access<br />
 Instruction
 --------------
 python 3.3 or higher is needed<br />
-1.Download and install python
+1.Download and install python<br />
 2.install flask by running `pip install flask`<br />
 3.Download zip and Copy all decomressed files to the folder where you place the mcserver(it's NOT a bukkit plugin, so don't put it in the /plugin folder!)<br />
 4.Edit properties in mcrsconfig.xml<br />
