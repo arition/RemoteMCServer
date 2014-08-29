@@ -33,9 +33,9 @@
 </nav>
 <div class="container">
   <div class="starter-template"> 
-    <form action="/loginyeah" method="post" class="form-signin" role="form">
+    <form action="/login" method="post" class="form-signin" role="form">
       <h3>登录</h3>
-      <div class="alert alert-warning alert-dismissable fade in" {{ name }}>
+      <div class="alert alert-warning alert-dismissable fade in" {{ name|safe }}>
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         用户名或密码错误！
       </div>
