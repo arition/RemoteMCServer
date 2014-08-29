@@ -11,9 +11,9 @@ __all__ = [
     "ctx", 
     "HTTPError", 
 
-    # 200, 201, 202, 204
-    "OK", "Created", "Accepted", "NoContent",    
-    "ok", "created", "accepted", "nocontent",
+    # 200, 201, 202
+    "OK", "Created", "Accepted",    
+    "ok", "created", "accepted",
     
     # 301, 302, 303, 304, 307
     "Redirect", "Found", "SeeOther", "NotModified", "TempRedirect", 
@@ -65,7 +65,6 @@ def _status_code(status, data=None, classname=None, docstring=None):
 ok = OK = _status_code("200 OK", data="")
 created = Created = _status_code("201 Created")
 accepted = Accepted = _status_code("202 Accepted")
-nocontent = NoContent = _status_code("204 No Content")
 
 class Redirect(HTTPError):
     """A `301 Moved Permanently` redirect."""
@@ -133,20 +132,20 @@ badrequest = BadRequest
 class Unauthorized(HTTPError):
     """`401 Unauthorized` error."""
     message = "unauthorized"
-    def __init__(self, message=None):
+    def __init__(self):
         status = "401 Unauthorized"
         headers = {'Content-Type': 'text/html'}
-        HTTPError.__init__(self, status, headers, message or self.message)
+        HTTPError.__init__(self, status, headers, self.message)
 
 unauthorized = Unauthorized
 
 class Forbidden(HTTPError):
     """`403 Forbidden` error."""
     message = "forbidden"
-    def __init__(self, message=None):
+    def __init__(self):
         status = "403 Forbidden"
         headers = {'Content-Type': 'text/html'}
-        HTTPError.__init__(self, status, headers, message or self.message)
+        HTTPError.__init__(self, status, headers, self.message)
 
 forbidden = Forbidden
 
@@ -190,50 +189,50 @@ nomethod = NoMethod
 class NotAcceptable(HTTPError):
     """`406 Not Acceptable` error."""
     message = "not acceptable"
-    def __init__(self, message=None):
+    def __init__(self):
         status = "406 Not Acceptable"
         headers = {'Content-Type': 'text/html'}
-        HTTPError.__init__(self, status, headers, message or self.message)
+        HTTPError.__init__(self, status, headers, self.message)
 
 notacceptable = NotAcceptable
 
 class Conflict(HTTPError):
     """`409 Conflict` error."""
     message = "conflict"
-    def __init__(self, message=None):
+    def __init__(self):
         status = "409 Conflict"
         headers = {'Content-Type': 'text/html'}
-        HTTPError.__init__(self, status, headers, message or self.message)
+        HTTPError.__init__(self, status, headers, self.message)
 
 conflict = Conflict
 
 class Gone(HTTPError):
     """`410 Gone` error."""
     message = "gone"
-    def __init__(self, message=None):
+    def __init__(self):
         status = '410 Gone'
         headers = {'Content-Type': 'text/html'}
-        HTTPError.__init__(self, status, headers, message or self.message)
+        HTTPError.__init__(self, status, headers, self.message)
 
 gone = Gone
 
 class PreconditionFailed(HTTPError):
     """`412 Precondition Failed` error."""
     message = "precondition failed"
-    def __init__(self, message=None):
+    def __init__(self):
         status = "412 Precondition Failed"
         headers = {'Content-Type': 'text/html'}
-        HTTPError.__init__(self, status, headers, message or self.message)
+        HTTPError.__init__(self, status, headers, self.message)
 
 preconditionfailed = PreconditionFailed
 
 class UnsupportedMediaType(HTTPError):
     """`415 Unsupported Media Type` error."""
     message = "unsupported media type"
-    def __init__(self, message=None):
+    def __init__(self):
         status = "415 Unsupported Media Type"
         headers = {'Content-Type': 'text/html'}
-        HTTPError.__init__(self, status, headers, message or self.message)
+        HTTPError.__init__(self, status, headers, self.message)
 
 unsupportedmediatype = UnsupportedMediaType
 
@@ -423,7 +422,7 @@ def parse_cookies(http_cookie):
                     cookie.load(attr_value)
                 except Cookie.CookieError:
                     pass
-        cookies = dict([(k, urllib.unquote(v.value)) for k, v in cookie.iteritems()])
+        cookies = dict((k, urllib.unquote(v.value)) for k, v in cookie.iteritems())
     else:
         # HTTP_COOKIE doesn't have quotes, use fast cookie parsing
         cookies = {}

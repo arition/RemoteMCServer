@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <config>
 	<mcargs><![CDATA[ -Xincgc -Xmx1G -jar craftbukkit-1.7.2-R0.2.jar -nojline]]></mcargs>
-	<!--javaexe><![CDATA[C:\Program Files\Java\jre7\bin\java.exe]]></javaexe-->
-	<javaexe><![CDATA[test.exe]]></javaexe>
+	<javaexe><![CDATA[C:\Program Files\Java\jre7\bin\java.exe]]></javaexe>
+	<!--javaexe><![CDATA[test.exe]]></javaexe-->
 	<username><![CDATA[admin]]></username>
 	<password><![CDATA[admin]]></password>
 	<expires><![CDATA[1200]]></expires>
