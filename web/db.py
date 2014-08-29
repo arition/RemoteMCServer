@@ -11,7 +11,7 @@ __all__ = [
   "database", 'DB',
 ]
 
-import time
+import time, os, urllib
 try:
     import datetime
 except ImportError:
@@ -296,6 +296,8 @@ def reparam(string_, dictionary):
         <sql: 's IN (1, 2)'>
     """
     dictionary = dictionary.copy() # eval mucks with it
+    # disable builtins to avoid risk for remote code exection.
+    dictionary['__builtins__'] = object()
     vals = []
     result = []
     for live, chunk in _interpolate(string_):
@@ -326,6 +328,8 @@ def sqlify(obj):
         return "'t'"
     elif obj is False:
         return "'f'"
+    elif isinstance(obj, long):
+        return str(obj)
     elif datetime and isinstance(obj, datetime.datetime):
         return repr(obj.isoformat())
     else:
@@ -613,11 +617,22 @@ class DB:
         #@@@ for backward-compatibility
         elif isinstance(where, (list, tuple)) and len(where) == 2:
             where = SQLQuery(where[0], where[1])
+        elif isinstance(where, dict):
+            where = self._where_dict(where)
         elif isinstance(where, SQLQuery):
             pass
         else:
             where = reparam(where, vars)        
         return where
+
+    def _where_dict(self, where):
+        where_clauses = []
+        for k, v in where.iteritems():
+            where_clauses.append(k + ' = ' + sqlquote(v))
+        if where_clauses:
+            return SQLQuery.join(where_clauses, " AND ")
+        else:
+            return None
     
     def query(self, sql_query, vars=None, processed=False, _test=False): 
         """
@@ -673,6 +688,8 @@ class DB:
             <sql: 'SELECT * FROM foo'>
             >>> db.select(['foo', 'bar'], where="foo.bar_id = bar.id", limit=5, _test=True)
             <sql: 'SELECT * FROM foo, bar WHERE foo.bar_id = bar.id LIMIT 5'>
+            >>> db.select('foo', where={'id': 5}, _test=True)
+            <sql: 'SELECT * FROM foo WHERE id = 5'>
         """
         if vars is None: vars = {}
         sql_clauses = self.sql_clauses(what, tables, where, group, order, limit, offset)
@@ -694,15 +711,7 @@ class DB:
             >>> db.where('foo', _test=True)
             <sql: 'SELECT * FROM foo'>
         """
-        where_clauses = []
-        for k, v in kwargs.iteritems():
-            where_clauses.append(k + ' = ' + sqlquote(v))
-            
-        if where_clauses:
-            where = SQLQuery.join(where_clauses, " AND ")
-        else:
-            where = None
-            
+        where = self._where_dict(kwargs)            
         return self.select(table, what=what, order=order, 
                group=group, limit=limit, offset=offset, _test=_test, 
                where=where)
@@ -726,6 +735,8 @@ class DB:
         #@@@
         elif isinstance(val, (list, tuple)) and len(val) == 2:
             nout = SQLQuery(val[0], val[1]) # backwards-compatibility
+        elif sql == 'WHERE' and isinstance(val, dict):
+            nout = self._where_dict(val)
         elif isinstance(val, SQLQuery):
             nout = val
         else:
@@ -815,10 +826,9 @@ class DB:
         keys = values[0].keys()
         #@@ make sure all keys are valid
 
-        # make sure all rows have same keys.
         for v in values:
             if v.keys() != keys:
-                raise ValueError, 'Bad data'
+                raise ValueError, 'Not all rows have the same keys'
 
         sql_query = SQLQuery('INSERT INTO %s (%s) VALUES ' % (tablename, ', '.join(keys)))
 
@@ -926,6 +936,8 @@ class PostgresDB(DB):
         if db_module.__name__ == "psycopg2":
             import psycopg2.extensions
             psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+        if db_module.__name__ == "pgdb" and 'port' in keywords:
+            keywords["host"] += ":" + str(keywords.pop('port'))
 
         # if db is not provided postgres driver will take it from PGDATABASE environment variable
         if 'db' in keywords:
@@ -1042,10 +1054,11 @@ class FirebirdDB(DB):
             db = None
             pass
         if 'pw' in keywords:
-            keywords['passwd'] = keywords['pw']
-            del keywords['pw']
-        keywords['database'] = keywords['db']
-        del keywords['db']
+            keywords['password'] = keywords.pop('pw')
+        keywords['database'] = keywords.pop('db')
+
+        self.paramstyle = db.paramstyle
+
         DB.__init__(self, db, keywords)
         
     def delete(self, table, where=None, using=None, vars=None, _test=False):
@@ -1131,6 +1144,33 @@ class OracleDB(DB):
         else:
             return query + "; SELECT %s.currval FROM dual" % seqname 
 
+def dburl2dict(url):
+    """
+    Takes a URL to a database and parses it into an equivalent dictionary.
+    
+        >>> dburl2dict('postgres://james:day@serverfarm.example.net:5432/mygreatdb')
+        {'pw': 'day', 'dbn': 'postgres', 'db': 'mygreatdb', 'host': 'serverfarm.example.net', 'user': 'james', 'port': '5432'}
+        >>> dburl2dict('postgres://james:day@serverfarm.example.net/mygreatdb')
+        {'user': 'james', 'host': 'serverfarm.example.net', 'db': 'mygreatdb', 'pw': 'day', 'dbn': 'postgres'}
+        >>> dburl2dict('postgres://james:d%40y@serverfarm.example.net/mygreatdb')
+        {'user': 'james', 'host': 'serverfarm.example.net', 'db': 'mygreatdb', 'pw': 'd@y', 'dbn': 'postgres'}
+    """
+    dbn, rest = url.split('://', 1)
+    user, rest = rest.split(':', 1)
+    pw, rest = rest.split('@', 1)
+    if ':' in rest:
+        host, rest = rest.split(':', 1)
+        port, rest = rest.split('/', 1)
+    else:
+        host, rest = rest.split('/', 1)
+        port = None
+    db = rest
+    
+    uq = urllib.unquote
+    out = dict(dbn=dbn, user=uq(user), pw=uq(pw), host=uq(host), db=uq(db))
+    if port: out['port'] = port
+    return out
+
 _databases = {}
 def database(dburl=None, **params):
     """Creates appropriate database using params.
@@ -1138,6 +1178,10 @@ def database(dburl=None, **params):
     Pooling will be enabled if DBUtils module is available. 
     Pooling can be disabled by passing pooling=False in params.
     """
+    if not dburl and not params:
+        dburl = os.environ['DATABASE_URL']
+    if dburl:
+        params = dburl2dict(dburl)
     dbn = params.pop('dbn')
     if dbn in _databases:
         return _databases[dbn](**params)

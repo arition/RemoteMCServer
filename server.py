@@ -116,11 +116,6 @@ class sendmsg:
         else:
             p.stdin.write(cmd.decode('utf-8').encode('gb2312')+'\n')
             p.stdin.flush()
-        cache_msg[cache_msg_num]=u"发送命令:"+cmd
-        cache_msg_num+=1
-        if cache_msg_num>9:
-            cache_msg_num=0
-        print u"发送命令:"+cmd+"<br />"
         session_st = datetime.datetime.now()
         return cmd
 
